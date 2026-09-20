@@ -257,3 +257,52 @@
 - **Verification**:
   - Verified `npm run build` compiled with 0 errors across 9 static routes.
 - **Ready for Commit & Push**: Staged all changes and prepared commit under human developer identity.
+
+## [2026-09-20 19:29:25 +07:00] - Phase 6: Kiosk Scanner UI & Core Logic
+
+### Summary of Prompt:
+- Review the Kiosk Scanner mockup in `Assets/UI/UI Absen.png`.
+- Replicate the large digital clock, centered optical HUD viewfinder, hardware telemetry bar, feedback status cards, and minimalist corporate terminal layout.
+- Build the Scanner page (`app/scanner/page.tsx` and `app/kiosk/page.tsx` for seamless routing).
+- Integrate `html5-qrcode` to scan QR codes and physical barcodes via user webcam/optical camera module, with simulator mode for testing.
+- Implement Core Check-in/Out Server Action:
+  - Query `Karyawan` by `qr_code_id`. Return "Invalid QR" if not found.
+  - Query `Absensi` on current day for that employee.
+  - Scenario A (Check-In): Create `Absensi` record, compare scan time with `Pengaturan.jam_masuk_normal` (default "08:00"), set `status_masuk` to "Tepat Waktu" or "Terlambat".
+  - Scenario B (Check-Out): Update record with `waktu_pulang`.
+  - Scenario C (Duplicate): Return warning if both `waktu_masuk` and `waktu_pulang` are already recorded today.
+- Visual Feedback:
+  - Green Success card overlay for "On Time" check-in or clean check-out.
+  - Rose/Yellow card overlay for "Late" check-in or error feedback.
+  - Employee photo/initials, role, department, RFID token, punctuality deviation, and gate unlock telemetry.
+- Update `log.md`, stage, commit as `Abryan Yoga Pratama <admin@local.dev>`, and push to repository.
+
+### Planned Actions:
+1. Re-inspect `Assets/UI/UI Absen.png` in detail:
+   - Top Bar: Terminal identity (`TERMINAL-01A`, `HQ Entrance North Turnstile • Gate Zone Alpha`), Large live digital clock (`12:19:16 AM`, `Sunday, September 20, 2026`, `NTP Synced`).
+   - Left Column: Optical Camera Module HUD (`Sensor Optical Module`, `60 FPS`, `Auto-Focus ON`, `1080p RGB`, crosshairs target brackets `ISO 400`, `QR/BARCODE READY`), Positioning guidance badge, optimal distance indicators.
+   - Right Column:
+     - Simulate Kiosk Scan mode controls (`On Time: Morning In`, `Late Entry: +34m Delay`, `Checked Out: Shift End`).
+     - Real-time Verification Feedback Card: `Verified: Logged In` green badge, `Welcome to HQ`, Employee photo & details (Name, Role, RFID ID), Shift Punctuality pill (`On Time (-19m)` / `Late (+34m)`), Desk assignment info.
+     - Gate Action Banner: `Turnstile A-01 Unlocked • Access Granted • 15s`.
+     - Offline Cache Engine & Telemetry: `0 Pending Logs • 100% Synced • Latency: 18ms`.
+   - Bottom Bar: Manual PIN entry button, Security Intercom, Mesh Secure LAN status, Admin Portal link.
+2. Build Server Action `recordAttendancePunch(qr_code_id)` in `src/actions/absensi.ts` implementing Scenarios A, B, and C with full transaction handling.
+3. Build the Kiosk Scanner interface in `src/app/scanner/page.tsx` (and `src/app/kiosk/page.tsx`) with webcam integration using `html5-qrcode`, live clock, audio tone feedback (optional chime), and simulation controls.
+4. Verify scanning, check-in, check-out, duplicate prevention, and visual feedback overlays.
+5. Run `npm run build` verification.
+6. Update `log.md`, commit, and push.
+
+### Completed Actions & Outcome:
+- **Server Action (`src/actions/absensi.ts`)**:
+  - Implemented `recordAttendancePunch(qr_code_id)` handling employee lookup, daily record checks, check-in vs check-out toggle logic, punctuality calculation against `Pengaturan.jam_masuk_normal`, and duplicate warning responses.
+- **Kiosk Scanner Interface (`src/app/scanner/page.tsx` & `src/app/kiosk/page.tsx`)**:
+  - Replicated `UI Absen.png` design system: minimalist dark/slate corporate terminal theme, large NTP-synced digital clock, and live status pill.
+  - Optical HUD Viewfinder: Integrated `html5-qrcode` webcam scanning wrapper with custom animated green laser scan line, targeting reticle, and camera state toggle.
+  - Simulation Control Panel: Added quick-action simulator buttons (`Scan On-Time`, `Scan Late`, `Scan Check-Out`, `Invalid QR`) for headless testing and demo environments.
+- **Verification & Feedback Overlays**:
+  - Built real-time success and warning card notifications with employee avatar, role, department, RFID token, and punctuality duration pills (e.g., `+34m Delay`, `On Time`).
+  - Triggered simulated gate unlock banners (`Turnstile A-01 Unlocked • Access Granted`) and audio-visual feedback indicators.
+- **Verification**:
+  - `npm run build` compiled successfully with 0 errors.
+- **Ready for Commit & Push**: Staged all changes and prepared commit under human developer identity.

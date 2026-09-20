@@ -293,3 +293,153 @@ async function seedAttendanceLogsInternal() {
     });
   }
 }
+
+// Core Attendance Punch Server Action for Kiosk Optical Scanner
+export async function recordAttendancePunch(
+  qrCodeId: string,
+  options?: {
+    customTime?: string; // Optional custom timestamp ISO for testing/simulation
+  }
+) {
+  try {
+    const trimmedToken = qrCodeId.trim();
+    if (!trimmedToken) {
+      return {
+        success: false,
+        type: "INVALID_QR",
+        message: "Invalid QR: Scanned token is empty.",
+      };
+    }
+
+    // 1. Query Karyawan
+    const karyawan = await prisma.karyawan.findUnique({
+      where: { qr_code_id: trimmedToken },
+    });
+
+    if (!karyawan) {
+      return {
+        success: false,
+        type: "INVALID_QR",
+        message: `Invalid QR: Employee credential "${trimmedToken}" not recognized.`,
+      };
+    }
+
+    // 2. Fetch Pengaturan for schedule threshold
+    const pengaturan = await prisma.pengaturan.findUnique({
+      where: { id: 1 },
+    });
+    const normalTimeStr = pengaturan?.jam_masuk_normal || "08:00:00";
+    const [normalHourStr, normalMinuteStr] = normalTimeStr.split(":");
+    const normalHour = parseInt(normalHourStr || "8", 10);
+    const normalMinute = parseInt(normalMinuteStr || "0", 10);
+    const normalMinutesFromMidnight = normalHour * 60 + normalMinute;
+
+    // 3. Determine current date and timestamp
+    const now = options?.customTime ? new Date(options.customTime) : new Date();
+    const today = new Date(now);
+    today.setHours(0, 0, 0, 0);
+
+    // 4. Check existing Absensi record on the CURRENT DATE
+    const existing = await prisma.absensi.findUnique({
+      where: {
+        karyawan_id_tanggal: {
+          karyawan_id: karyawan.id,
+          tanggal: today,
+        },
+      },
+    });
+
+    const currentMinutesFromMidnight = now.getHours() * 60 + now.getMinutes();
+
+    // Scenario C: Duplicate (Both Check-In and Check-Out already registered)
+    if (existing && existing.waktu_masuk !== null && existing.waktu_pulang !== null) {
+      return {
+        success: false,
+        scenario: "DUPLICATE",
+        type: "ALREADY_COMPLETED",
+        karyawan,
+        record: existing,
+        message: `Attendance completed for today. Shift check-in and check-out already registered.`,
+      };
+    }
+
+    // Scenario B: Check-Out (Check-In exists, but Check-Out is empty)
+    if (existing && existing.waktu_masuk !== null && existing.waktu_pulang === null) {
+      const updated = await prisma.absensi.update({
+        where: { id: existing.id },
+        data: {
+          waktu_pulang: now,
+        },
+      });
+
+      try {
+        revalidatePath("/admin/absensi");
+        revalidatePath("/absensi");
+        revalidatePath("/admin");
+      } catch (_) {}
+
+      return {
+        success: true,
+        scenario: "CHECK_OUT",
+        status: "Checked Out",
+        karyawan,
+        record: updated,
+        message: `Shift departure registered. Access granted for egress turnstile.`,
+      };
+    }
+
+    // Scenario A: Check-In (New record or empty check-in)
+    const isLate = currentMinutesFromMidnight > normalMinutesFromMidnight;
+    const deviationMinutes = isLate
+      ? currentMinutesFromMidnight - normalMinutesFromMidnight
+      : normalMinutesFromMidnight - currentMinutesFromMidnight;
+
+    const status_masuk = isLate ? "Terlambat" : "Tepat Waktu";
+
+    const record = await prisma.absensi.upsert({
+      where: {
+        karyawan_id_tanggal: {
+          karyawan_id: karyawan.id,
+          tanggal: today,
+        },
+      },
+      update: {
+        waktu_masuk: now,
+        status_masuk,
+      },
+      create: {
+        karyawan_id: karyawan.id,
+        tanggal: today,
+        waktu_masuk: now,
+        status_masuk,
+      },
+    });
+
+    try {
+      revalidatePath("/admin/absensi");
+      revalidatePath("/absensi");
+      revalidatePath("/admin");
+    } catch (_) {}
+
+    return {
+      success: true,
+      scenario: "CHECK_IN",
+      status: status_masuk,
+      isLate,
+      deviationMinutes,
+      karyawan,
+      record,
+      message: isLate
+        ? `Late entry recorded (+${deviationMinutes}m delay). Access granted.`
+        : `Verified: Logged In on time (-${deviationMinutes}m). Welcome to HQ!`,
+    };
+  } catch (error) {
+    console.error("Error processing attendance punch:", error);
+    return {
+      success: false,
+      type: "SERVER_ERROR",
+      message: "Internal server error occurred while registering punch.",
+    };
+  }
+}
+
