@@ -55,3 +55,52 @@
 - **Global CSS & Theme**: Configured `globals.css` with corporate tokens (slate-50 background, slate-200 borders, blue-600 / brand-teal corporate accents).
 - **Production Build Verification**: Ran `npm run build` with Turbopack, compiling successfully with 0 errors.
 - **Ready for Commit & Push**: Staging all initialized project files.
+
+## [2026-09-20 17:13:55 +07:00] - Phase 2: Database Architecture
+
+### Summary of Prompt:
+- Configure Prisma for SQLite (for quick development and zero-config local run) while keeping architecture cleanly switchable to PostgreSQL.
+- Define Prisma Schema with models:
+  - `Karyawan`: `id` (String/UUID, default uuid), `nama_lengkap` (String), `jabatan` (String), `qr_code_id` (String, unique).
+  - `Pengaturan`: `id` (Int, default 1), `jam_masuk_normal` (String, default "08:00:00").
+  - `Absensi`: `id` (String/UUID, default uuid), `karyawan_id` (relation to `Karyawan`), `tanggal` (DateTime), `waktu_masuk` (DateTime, nullable), `waktu_pulang` (DateTime, nullable), `status_masuk` (String: "Tepat Waktu", "Terlambat", "Alpha").
+  - Compound unique constraint on `[karyawan_id, tanggal]` in `Absensi`.
+- Format schema, generate Prisma Client, and run the initial migration.
+- Create global Prisma client singleton in `lib/prisma.ts` (and `src/lib/prisma.ts` for consistency).
+- Create database seed script (`prisma/seed.ts`) to insert default `Pengaturan` record (`jam_masuk_normal: "08:00"`).
+- Verify migrations, seed execution, and schema integrity.
+- Update `log.md`, commit as `Abryan Yoga Pratama <admin@local.dev>`, and push.
+
+### Planned Actions:
+1. Update `prisma/schema.prisma` with SQLite provider (`url = env("DATABASE_URL")` / `file:./dev.db`), and models `Karyawan`, `Pengaturan`, `Absensi` with compound unique index `@@unique([karyawan_id, tanggal])`.
+2. Configure `DATABASE_URL` in `.env` and `prisma7.config.ts` / `prisma.config.ts` to point to `file:./dev.db`.
+3. Format schema with `npx prisma format`.
+4. Run migration with `npx prisma migrate dev --name init`.
+5. Generate Prisma Client with `npx prisma generate`.
+6. Implement singleton Prisma client in `src/lib/prisma.ts` and `lib/prisma.ts` (handling Next.js hot reload / globalThis pattern).
+7. Create seed script `prisma/seed.ts` and configure `"prisma": { "seed": "tsx prisma/seed.ts" }` (or node runner) in `package.json`. Run `npx prisma db seed`.
+8. Update `log.md` with completed actions and outputs.
+9. Commit all changes and push to remote repository as `Abryan Yoga Pratama`.
+
+### Completed Actions & Outcome:
+- **Schema Design (`prisma/schema.prisma`)**:
+  - Configured `sqlite` provider for lightweight setup, easily switchable to `postgresql`.
+  - Added model `Karyawan` with UUID `id`, `nama_lengkap`, `jabatan`, and unique `qr_code_id`.
+  - Added model `Pengaturan` with Int `id` (default 1) and `jam_masuk_normal` (default "08:00:00").
+  - Added model `Absensi` with UUID `id`, `karyawan_id` foreign key relation to `Karyawan`, `tanggal` (date), nullable `waktu_masuk` and `waktu_pulang`, and `status_masuk`.
+  - Created compound unique index `@@unique([karyawan_id, tanggal])` on `Absensi` to enforce one attendance record per employee per day.
+- **Prisma Tooling & Migration**:
+  - Formatted schema with `npx prisma format`.
+  - Created and applied migration `20260920101847_init` via `npx prisma migrate dev --name init`.
+  - Generated type-safe client with `npx prisma generate` to `src/generated/prisma`.
+- **Global Prisma Client Singleton**:
+  - Implemented `src/lib/prisma.ts` and `lib/prisma.ts` using `@prisma/adapter-better-sqlite3` and `@prisma/adapter-pg`.
+  - Client automatically detects connection string and switches between SQLite (`file:`) and PostgreSQL (`postgresql:`) seamlessly.
+- **Database Seeding**:
+  - Created `prisma/seed.ts` inserting default `Pengaturan` row (`id: 1`, `jam_masuk_normal: "08:00"`).
+  - Configured `seed` in `prisma7.config.ts` and `package.json`.
+  - Ran `npx prisma db seed` with successful verification.
+- **Verification**:
+  - Executed queries against local database successfully.
+  - Verified `npm run build` compiles with 0 errors.
+- **Ready for Commit & Push**: Staged all changes and prepared commit under human developer identity.
