@@ -104,3 +104,59 @@
   - Executed queries against local database successfully.
   - Verified `npm run build` compiles with 0 errors.
 - **Ready for Commit & Push**: Staged all changes and prepared commit under human developer identity.
+
+## [2026-09-20 17:24:35 +07:00] - Phase 3: Admin Layout & Navigation
+
+### Summary of Prompt:
+- Read and analyze the Admin Layout PNG mockups in `Assets/UI/` (`UI DASHBOARD.png`, `UI ATTEDANCE.png`, `UI EMPLOYEE.png`).
+- Build the Admin Layout (`app/(admin)/layout.tsx` / `src/app/(admin)/layout.tsx`) following strict flat design architecture (no nested cards, relying on clean whitespace, subtle borders).
+- Build the Collapsible Sidebar Component (`components/Sidebar.tsx` / `src/components/Sidebar.tsx`) matching the mockup:
+  - Toggle button for expanded/collapsed states (collapse toggle icon at top right of sidebar or bottom).
+  - Brand header: "AttendScan Enterprise Core" with stylized green logo icon.
+  - Category header: "OPERATIONS" / "WORKSPACE".
+  - Menu navigation items:
+    - Dashboard (`/admin`)
+    - Employees (`/admin/karyawan`)
+    - Attendance (`/admin/absensi`)
+    - System Settings (`/admin/settings`)
+  - Bottom action: "Switch to Kiosk" / user profile quick toggle.
+- Build the Top Navbar (`components/Navbar.tsx` / `src/components/Navbar.tsx`) containing:
+  - Breadcrumb navigation: e.g. "Administration > Live Monitor" or "Enterprise Core > Operations Desk".
+  - Status indicator: "System Online • 99.9% Sync" with live pulse dot.
+  - Quick Search bar with shortcut indicator (`⌘K` / `Ctrl+K`).
+  - Notification icon with badge indicator.
+  - Admin Profile dropdown/card (Eleanor Vance - Chief of HR Operations / Admin avatar).
+- Update `log.md`, stage, commit as `Abryan Yoga Pratama <admin@local.dev>`, and push.
+
+### Planned Actions:
+1. Re-examine the 3 admin mockups (`UI DASHBOARD.png`, `UI ATTEDANCE.png`, `UI EMPLOYEE.png`) with special focus on Sidebar details, Top Navbar structure, breadcrumbs, search input, and profile header.
+2. Build `src/components/Sidebar.tsx` (and `components/Sidebar.tsx` alias) with collapsible state, smooth transition, active route highlight with brand-teal `#006b5f` active pill/background, icons from `lucide-react`, and footer kiosk switcher.
+3. Build `src/components/Navbar.tsx` (and `components/Navbar.tsx`) with dynamic breadcrumb / page title, sync badge, search bar, notification button, and profile trigger.
+4. Implement `src/app/(admin)/layout.tsx` integrating the collapsible Sidebar and Top Navbar, wrapping children in a clean flat container on `bg-slate-50`.
+5. Create initial placeholder admin pages for `/admin` (`page.tsx`), `/admin/karyawan` (`page.tsx`), and `/admin/absensi` (`page.tsx`) so navigation routes render seamlessly.
+6. Verify layout and responsive / collapsed interactions, run `npm run build` to ensure type-safety.
+7. Update `log.md`, commit, and push.
+
+### Completed Actions & Outcome:
+- **Mockup Analysis**: Re-analyzed `UI DASHBOARD.png`, `UI ATTEDANCE.png`, and `UI EMPLOYEE.png`. Mapped exact visual components:
+  - Sidebar: AttendScan brand icon, `PanelLeftClose`/`PanelLeftOpen` toggle, navigation pill styling (`#006b5f`), "Switch to Kiosk" action, and HR profile info.
+  - Navbar: Breadcrumbs, live status indicator (`System Online • 99.9% Sync`), quick search input with `⌘K` badge, notification bell with alert dot, and Eleanor Vance profile card.
+  - Strict Flat Architecture: Slate-50 background, slate-200 1px borders, subtle padding and whitespace, eliminating unnecessary nested card containers.
+- **Collapsible Sidebar (`src/components/Sidebar.tsx` & `components/Sidebar.tsx`)**:
+  - Implemented responsive collapsible state toggle.
+  - Configured navigation routes: Dashboard (`/admin`), Employees (`/admin/karyawan`), Attendance (`/admin/absensi`), and Settings (`/admin/settings`).
+  - Active links styled with deep emerald-teal background and white icons.
+  - Added bottom Kiosk shortcut button and operator profile.
+- **Top Navbar (`src/components/Navbar.tsx` & `components/Navbar.tsx`)**:
+  - Built breadcrumb reflecting active page section and subtitle.
+  - Added real-time operational status pill with pulse indicator.
+  - Added search bar, notification action, and user profile card.
+- **Admin Layout (`src/app/(admin)/layout.tsx`)**:
+  - Structured full-height dual-pane layout with sticky sidebar and fluid main content viewport.
+- **Route Views Initialized**:
+  - Created `/admin` (Dashboard telemetry & overview cards).
+  - Created `/admin/karyawan` (Employees directory structure).
+  - Created `/admin/absensi` (Attendance logs view).
+- **Verification**:
+  - Production build compiled successfully (`npm run build`) generating static routes with 0 errors.
+- **Ready for Commit & Push**: Staged all changes and prepared commit under human developer identity.
