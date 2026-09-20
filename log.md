@@ -206,3 +206,54 @@
 - **Verification**:
   - `npm run build` compiled with 0 errors across all routes.
 - **Ready for Commit & Push**: Staged all changes and prepared commit under human developer identity.
+
+## [2026-09-20 17:33:53 +07:00] - Phase 5: Attendance Logs Dashboard
+
+### Summary of Prompt:
+- Analyze `UI ATTEDANCE.png` mockup in `Assets/UI/` for date picker styling, filter pills, search bar, table layout, and status badge color-coding.
+- Build Attendance Logs page (`app/(admin)/absensi/page.tsx` / `src/app/(admin)/admin/absensi/page.tsx`).
+- Implement the Date Picker and quick date presets (Today, Yesterday, Last 7 Days, This Month) to filter attendance logs.
+- Build the full flat-design Data Table displaying `Absensi` records:
+  - Columns: Employee Name (with avatar initials & ID), Date, Time In, Time Out, Status (`status_masuk`), Terminal / Gate, Audit history action.
+- Status Badges: Render `status_masuk` using Shadcn `Badge` strictly matching mockup color coding:
+  - "Tepat Waktu" / "On Time": emerald badge with green dot (`bg-emerald-50 text-emerald-700 border-emerald-200`)
+  - "Terlambat" / "Late": rose/red badge with red dot (`bg-rose-50 text-rose-700 border-rose-200`) and delay badge (e.g. `+22m`)
+  - "Alpha" / "Not Checked Out" / Incomplete: slate badge (`bg-slate-100 text-slate-700 border-slate-200`)
+- Build Server Actions (`src/actions/absensi.ts`) to fetch records with date filtering, relations to `Karyawan`, and telemetry counts.
+- Seed sample attendance logs so the dashboard reflects live data immediately.
+- Update `log.md`, commit, and push.
+
+### Planned Actions:
+1. Review `Assets/UI/UI ATTEDANCE.png` in detail to map exact component layout:
+   - Header title: "Attendance Logs", live sync pill, Export CSV and Print Log buttons.
+   - 4 Top Metrics: Total Scans Today, On-Time Rate, Average Check-In, Active Shift Staff.
+   - Filter bar: Date selector with calendar dropdown, quick pills (Today, Yesterday, Last 7 Days, This Month), Department filter dropdown, search filter.
+   - Status tabs: All, On Time, Late, Not Checked Out.
+   - Flat Data Table: Employee details, formatted date, Time In (with check/clock icon), Time Out, Status badge pill, Terminal/Gate.
+2. Build Server Actions in `src/actions/absensi.ts`:
+   - `getAttendanceLogs(filters)`: filters by date, status, search query; includes employee relation.
+   - `getAttendanceStats()`: computes total scans, on-time percentage, average check-in, active count.
+   - Seed sample attendance records if none exist for today.
+3. Build the Attendance Logs Page in `src/app/(admin)/admin/absensi/page.tsx` and `src/app/(admin)/absensi/page.tsx`.
+4. Implement date picker filter and quick-range filters.
+5. Implement status pill rendering matching mockup color tokens.
+6. Verify production build (`npm run build`).
+7. Update `log.md`, commit as `Abryan Yoga Pratama <admin@local.dev>`, and push.
+
+### Completed Actions & Outcome:
+- **Server Actions (`src/actions/absensi.ts`)**:
+  - Implemented `getAttendanceLogs()` supporting dynamic date range, status, department, and text search filtering with full `karyawan` relation inclusion.
+  - Implemented `getAttendanceStats()` calculating today's scan totals, punctuality rate, average check-in timestamp, active shift headcount, and breakdown tallies.
+  - Implemented automatic initial attendance telemetry seeding for sample employees so data is immediately visual and actionable.
+- **Attendance Logs Dashboard (`src/app/(admin)/admin/absensi/page.tsx` & `src/app/(admin)/absensi/page.tsx`)**:
+  - Replicated exact structure of `UI ATTEDANCE.png`.
+  - Date Filter bar: Calendar date picker input + range pills (`Today`, `Yesterday`, `Last 7 Days`, `This Month`), department filter dropdown, and live refresh button.
+  - Filter Tabs: `All`, `On Time`, `Late`, `Not Checked Out` with count indicators.
+  - Search input: Real-time search filtering across staff names, IDs, and departments.
+  - Summary cards: Total Scans Today, On-Time Rate, Average Check-In, Active Shift Staff.
+  - Data Table: Full-width flat table with formatted Date (`MMM dd, yyyy`), Time In with status indicator, Time Out (or `— In Progress`), Terminal/Gate, and Audit action.
+  - Status Badges: Strictly styled using Shadcn `Badge` following mockup color coding (`emerald` for On Time, `rose` for Late with deviation duration, `slate` for Not Checked Out, `amber` for Alpha).
+  - Export & Print: Added CSV export utility and Print Log action triggering `window.print()`.
+- **Verification**:
+  - Verified `npm run build` compiled with 0 errors across 9 static routes.
+- **Ready for Commit & Push**: Staged all changes and prepared commit under human developer identity.
