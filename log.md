@@ -466,5 +466,23 @@
   - Added interactive mirror toggle control (`isMirrored` state with `localStorage` persistence) in both the sensor header bar and directly floating on the optical HUD viewfinder (`Jangan Mirror (Normal)` vs `Mirror: Aktif`).
   - Verified tests (`npm run test`) and ESLint (`npx eslint --quiet`) with 0 errors.
 
+## [2026-09-20 20:31:50 +07:00] - Permanent Kiosk Camera Mirror Mode
 
+### Summary & Planned Actions:
+- **User Request**: "buat jadi mirror doang aja" (Set camera preview to be permanently mirrored like a natural selfie mirror, removing toggle clutter).
+- **Planned Actions**:
+  1. Set `#kiosk-video-viewfinder` video element permanently to mirrored orientation (`[&_video]:-scale-x-100`).
+  2. Remove superfluous mirror toggle buttons and state from `src/app/scanner/page.tsx` while preserving the Front/Rear camera switcher for tablets.
+  3. Validate automated tests (`npm run test`) and ESLint (`npx eslint --quiet`).
+  4. Complete `log.md` entry, commit, and push to GitHub repository.
 
+### Completed Actions & Outcome:
+- **Permanent Mirror Mode (`src/app/scanner/page.tsx`)**:
+  - Updated `#kiosk-video-viewfinder` to apply `[&_video]:-scale-x-100` permanently, providing a natural selfie-mirror reflection.
+  - Cleaned up redundant mirror toggle buttons and state, preserving a minimalist, distraction-free viewfinder.
+- **Validation**:
+  - `npm run test`: All 7 automated unit and integration tests passed cleanly.
+  - `npx eslint --quiet`: 0 errors.
+- **Git Push**:
+  - Author confirmed as `Abryan Yoga Pratama <admin@local.dev>`.
+  - Ready to commit and push.
