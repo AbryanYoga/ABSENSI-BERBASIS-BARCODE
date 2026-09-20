@@ -2,13 +2,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { 
   Users, 
-  Clock, 
   AlertTriangle, 
   Wifi, 
   ExternalLink, 
   TrendingUp, 
   CheckCircle2, 
-  ArrowUpRight 
 } from "lucide-react";
 
 export default function AdminDashboardPage() {

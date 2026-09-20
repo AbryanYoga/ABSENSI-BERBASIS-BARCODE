@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import { Search, Bell, HelpCircle, ChevronDown } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 
 export function Navbar() {
   const pathname = usePathname();

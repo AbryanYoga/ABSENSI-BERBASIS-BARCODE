@@ -15,8 +15,6 @@ import {
   Scan, 
   Printer, 
   RotateCw, 
-  Download, 
-  ShieldCheck, 
   CheckCircle2, 
   Loader2 
 } from "lucide-react";

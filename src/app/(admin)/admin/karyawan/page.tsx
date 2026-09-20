@@ -10,7 +10,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { EmployeeSheet } from "@/components/karyawan/EmployeeSheet";
 import { DeleteEmployeeDialog } from "@/components/karyawan/DeleteEmployeeDialog";
@@ -25,9 +24,6 @@ import {
   Edit2,
   Trash2,
   Users,
-  ShieldCheck,
-  CheckCircle2,
-  Clock,
   Loader2,
   Copy,
   Check,

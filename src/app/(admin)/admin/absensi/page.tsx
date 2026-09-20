@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { getAttendanceLogs, getAttendanceStats, AttendanceRecord } from "@/actions/absensi";
+import { getAttendanceLogs, getAttendanceStats, AttendanceRecord, AttendanceStats } from "@/actions/absensi";
 import {
   Calendar as CalendarIcon,
   Download,
@@ -25,15 +25,13 @@ import {
   AlertTriangle,
   History,
   Building2,
-  Users,
   Scan,
   Loader2,
-  Check,
 } from "lucide-react";
 
 export default function AttendanceLogsPage() {
   const [logs, setLogs] = useState<AttendanceRecord[]>([]);
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<AttendanceStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -47,7 +45,13 @@ export default function AttendanceLogsPage() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      let filterPayload: any = {
+      const filterPayload: {
+        startDate?: string;
+        endDate?: string;
+        date?: string;
+        status?: string;
+        search?: string;
+      } = {
         status: statusTab,
         search: searchQuery,
       };
@@ -372,7 +376,7 @@ export default function AttendanceLogsPage() {
               <button
                 key={tab.key}
                 type="button"
-                onClick={() => setStatusTab(tab.key as any)}
+                onClick={() => setStatusTab(tab.key as "All" | "On Time" | "Late" | "Not Checked Out")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                   isActive
                     ? "bg-[#006b5f] text-white shadow-2xs"

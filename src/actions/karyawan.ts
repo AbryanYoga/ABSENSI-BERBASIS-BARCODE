@@ -72,9 +72,9 @@ export async function createKaryawan(formData: {
     revalidatePath("/karyawan");
     revalidatePath("/admin");
     return { success: true, data: karyawan };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to create employee:", error);
-    if (error.code === "P2002") {
+    if (typeof error === "object" && error !== null && "code" in error && (error as { code: string }).code === "P2002") {
       return { success: false, error: "QR Code ID must be unique." };
     }
     return { success: false, error: "Failed to create employee record." };

@@ -306,3 +306,53 @@
 - **Verification**:
   - `npm run build` compiled successfully with 0 errors.
 - **Ready for Commit & Push**: Staged all changes and prepared commit under human developer identity.
+
+## [2026-09-20 19:41:24 +07:00] - Phase 7: Production Preparation & Deployment Setup
+
+### Summary of Prompt:
+- Database Production Setup:
+  - Transition architecture documentation from local SQLite/Dev to Production PostgreSQL (Supabase, Vercel Postgres, Neon, or AWS RDS).
+  - Create comprehensive deployment guide in `DEPLOYMENT.md` explaining how to configure the production `DATABASE_URL` in `.env` / Vercel Environment Variables.
+  - Detail commands and instructions in `DEPLOYMENT.md` for switching Prisma provider to `postgresql` and executing `npx prisma migrate deploy` in CI/CD and production environments.
+- Build Optimization:
+  - Run full test build locally (`npm run build`) to ensure zero TypeScript, ESLint, or Turbopack errors prior to Vercel deployment.
+  - Automatically fix and document any discovered build issues.
+- Kiosk Responsiveness & Mobile/Tablet Permissions Check:
+  - Enhance `/scanner` and `/kiosk` pages for mobile and tablet responsiveness (iPad / Android tablets mounted at turnstiles).
+  - Ensure camera permission requests handle iOS Safari (`facingMode: "environment"` / `"user"` with HTTPS requirement) and Android Chrome correctly with explicit permission trigger buttons.
+- Final Repository Cleanup:
+  - Verify all `.env*` files are strictly ignored in `.gitignore`.
+  - Rewrite root `README.md` into a clean, modern corporate documentation guide covering architecture, features, UI mockups, tech stack, and setup guides.
+- Update `log.md`, stage, commit with message "chore: prepare for production deployment", and push.
+
+### Planned Actions:
+1. Create `DEPLOYMENT.md` covering PostgreSQL setup, Supabase / Vercel Postgres connection string templates, pooler connection details, migration workflow (`prisma migrate deploy`), and production environment variables.
+2. Review and optimize `src/app/scanner/page.tsx` for tablet/mobile responsiveness:
+   - Responsive flex/grid wrapping for tablet portrait/landscape orientations.
+   - Enhanced camera permission handling with explicit user gesture fallback for iOS Safari and Android Chrome (`facingMode: { ideal: "environment" }` or `"user"`).
+   - AudioContext unlock on first user interaction to comply with mobile browser autoplay policies.
+3. Verify `.gitignore` rules to ensure all `.env` files and SQLite binaries are strictly excluded.
+4. Rewrite `README.md` with comprehensive product overview, features, Stitch AI UI mockup references, tech stack, quick start guide, and deployment instructions.
+5. Run test build (`npm run build`) and ESLint (`npm run lint` or `npx eslint`) to guarantee 0 build or lint errors.
+6. Update `log.md` with completed actions and outputs.
+7. Stage all changes, commit as `Abryan Yoga Pratama <admin@local.dev>` with message `"chore: prepare for production deployment"`, and push to remote repository.
+
+### Completed Actions & Outcome:
+- **Deployment Guide (`DEPLOYMENT.md`)**:
+  - Authored a comprehensive production deployment manual detailing transitions from local SQLite to cloud PostgreSQL (Supabase, Vercel Postgres / Neon, AWS RDS).
+  - Documented connection pooling configurations (`pgbouncer=true`, `DIRECT_URL`), migration execution (`npx prisma migrate deploy`), and database seeding (`npx prisma db seed`).
+  - Added kiosk tablet mounting instructions (HTTPS mandatory requirement for iOS Safari / Android Chrome, PWA Home Screen mode, and camera permission handling).
+- **Build Optimization & Codebase Hardening**:
+  - Addressed TypeScript compilation requirements: defined type-safe `AbsensiWhereInput` and strongly typed `AttendanceStats` interface across `src/actions/absensi.ts` and `src/app/(admin)/admin/absensi/page.tsx`.
+  - Resolved ESLint rules and cleaned up unused icons/variables across `Navbar.tsx`, `EmployeeSheet.tsx`, `QrCodeDialog.tsx`, `admin/karyawan/page.tsx`, `admin/absensi/page.tsx`, `admin/page.tsx`, and `scanner/page.tsx`.
+  - Successfully verified production build with `npm run build` and `npx eslint --quiet`: 0 errors, 0 lint failures, all 11 routes prerendered cleanly.
+- **Kiosk Tablet Camera & Mobile Responsiveness**:
+  - Enhanced `src/app/scanner/page.tsx` with dedicated front/rear camera toggle controls for tablets mounted on turnstiles in either portrait or landscape.
+  - Implemented explicit user-gesture buttons (`Start Front Camera` / `Start Rear Camera`) to comply with iOS Safari and Android Chrome media permission requirements.
+  - Added HTTPS warnings for mobile network testing alongside full headless simulation mode.
+- **Repository Cleanup**:
+  - Confirmed `.gitignore` rules strictly prevent leaking `.env*` secrets and SQLite database files (`dev.db`).
+  - Rewrote `README.md` into an enterprise-grade documentation manual with badge telemetry, feature breakdowns, architecture schemas, and setup commands.
+- **Ready for Production Commit & Push**:
+  - Configured developer identity as `Abryan Yoga Pratama <admin@local.dev>`.
+  - All Phase 7 criteria successfully satisfied.

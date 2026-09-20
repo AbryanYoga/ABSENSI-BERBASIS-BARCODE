@@ -16,12 +16,9 @@ import {
   LogOut,
   Camera,
   CameraOff,
-  Maximize2,
-  Lock,
   Unlock,
   ShieldCheck,
   Wifi,
-  Sparkles,
   RotateCw,
   XCircle,
   HelpCircle,
@@ -73,9 +70,12 @@ export default function KioskScannerPage() {
     });
   }, []);
 
-  // 3. Initialize / toggle camera using html5-qrcode
-  const startCamera = async () => {
+  const [currentFacingMode, setCurrentFacingMode] = useState<"user" | "environment">("user");
+
+  // 3. Initialize / toggle camera using html5-qrcode with mobile & tablet fallback
+  const startCamera = async (facing: "user" | "environment" = currentFacingMode) => {
     setCameraError(null);
+    setCurrentFacingMode(facing);
     try {
       if (scannerRef.current) {
         try {
@@ -86,23 +86,69 @@ export default function KioskScannerPage() {
       const html5QrCode = new Html5Qrcode("kiosk-video-viewfinder");
       scannerRef.current = html5QrCode;
 
-      await html5QrCode.start(
-        { facingMode: "user" },
-        {
-          fps: 15,
-          qrbox: { width: 220, height: 220 },
+      const qrConfig = {
+        fps: 15,
+        qrbox: (viewfinderWidth: number, viewfinderHeight: number) => {
+          const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+          const edgeSize = Math.floor(minEdge * 0.7);
+          return { width: Math.max(180, edgeSize), height: Math.max(180, edgeSize) };
         },
-        (decodedText) => {
-          handleTokenScan(decodedText);
-        },
-        () => {
-          // Frame error (no QR detected in frame) - ignore
+        aspectRatio: 1.0,
+      };
+
+      try {
+        // First attempt with requested facing mode
+        await html5QrCode.start(
+          { facingMode: facing },
+          qrConfig,
+          (decodedText) => {
+            handleTokenScan(decodedText);
+          },
+          () => {}
+        );
+        setIsCameraActive(true);
+      } catch (firstErr) {
+        console.warn(`Camera start failed with facingMode ${facing}, trying fallback...`, firstErr);
+        // Fallback to opposite facingMode (e.g. environment or user)
+        const fallbackMode = facing === "user" ? "environment" : "user";
+        try {
+          await html5QrCode.start(
+            { facingMode: fallbackMode },
+            qrConfig,
+            (decodedText) => {
+              handleTokenScan(decodedText);
+            },
+            () => {}
+          );
+          setCurrentFacingMode(fallbackMode);
+          setIsCameraActive(true);
+        } catch (secondErr) {
+          // Last resort: query any available video device
+          const devices = await Html5Qrcode.getCameras();
+          if (devices && devices.length > 0) {
+            await html5QrCode.start(
+              devices[0].id,
+              qrConfig,
+              (decodedText) => {
+                handleTokenScan(decodedText);
+              },
+              () => {}
+            );
+            setIsCameraActive(true);
+          } else {
+            throw new Error("No optical camera input device detected.");
+          }
         }
-      );
-      setIsCameraActive(true);
+      }
     } catch (err: any) {
       console.warn("Camera init failed:", err);
-      setCameraError("Camera unavailable or permission denied. Simulator mode is active.");
+      const isHttps = typeof window !== "undefined" && window.location.protocol === "https:";
+      const isLocalhost = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+      let msg = "Camera access unavailable or permission denied. Simulator mode is active.";
+      if (!isHttps && !isLocalhost) {
+        msg = "Camera requires HTTPS on mobile browsers (Safari/Chrome). Please connect via HTTPS or use Simulator mode.";
+      }
+      setCameraError(msg);
       setIsCameraActive(false);
     }
   };
@@ -119,7 +165,7 @@ export default function KioskScannerPage() {
 
   useEffect(() => {
     // Attempt camera start on mount
-    startCamera();
+    startCamera("user");
     return () => {
       if (scannerRef.current) {
         try {
@@ -299,6 +345,18 @@ export default function KioskScannerPage() {
             <div className="flex items-center gap-2">
               <Camera className="w-4 h-4 text-slate-500" />
               <span className="font-semibold text-slate-800">Sensor Optical Module</span>
+              <button
+                type="button"
+                onClick={() => {
+                  const nextMode = currentFacingMode === "user" ? "environment" : "user";
+                  startCamera(nextMode);
+                }}
+                className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white hover:bg-slate-100 border border-slate-200 text-[11px] font-medium text-slate-700 transition-colors cursor-pointer"
+                title="Switch between front and rear camera on tablets"
+              >
+                <RotateCw className="w-3 h-3 text-[#006b5f]" />
+                <span className="capitalize">{currentFacingMode} Camera</span>
+              </button>
             </div>
             <div className="flex items-center gap-3 font-mono text-[11px] text-slate-500">
               <span className="flex items-center gap-1.5">
@@ -364,14 +422,25 @@ export default function KioskScannerPage() {
                 <p className="text-xs text-slate-300 max-w-xs">
                   {cameraError || "Optical camera is currently paused."}
                 </p>
-                <Button
-                  size="sm"
-                  onClick={startCamera}
-                  className="bg-[#006b5f] hover:bg-[#00544a] text-white text-xs"
-                >
-                  <Camera className="w-3.5 h-3.5 mr-1.5" />
-                  Start Camera Feed
-                </Button>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  <Button
+                    size="sm"
+                    onClick={() => startCamera("user")}
+                    className="bg-[#006b5f] hover:bg-[#00544a] text-white text-xs cursor-pointer"
+                  >
+                    <Camera className="w-3.5 h-3.5 mr-1.5" />
+                    Start Front Camera
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => startCamera("environment")}
+                    className="bg-slate-800 hover:bg-slate-700 text-white border-slate-700 text-xs cursor-pointer"
+                  >
+                    <RotateCw className="w-3.5 h-3.5 mr-1.5" />
+                    Start Rear Camera
+                  </Button>
+                </div>
               </div>
             )}
           </div>

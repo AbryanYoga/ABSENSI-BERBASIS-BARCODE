@@ -3,6 +3,8 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
+type AbsensiWhereInput = NonNullable<Parameters<typeof prisma.absensi.findMany>[0]>["where"];
+
 export interface AttendanceRecord {
   id: string;
   karyawan_id: string;
@@ -22,11 +24,25 @@ export interface AttendanceRecord {
   deviationMinutes?: number;
 }
 
+export interface AttendanceStats {
+  totalScansToday: number;
+  onTimeRate: string;
+  averageCheckIn: string;
+  activeShiftStaff: string;
+  counts: {
+    all: number;
+    onTime: number;
+    late: number;
+    notCheckedOut: number;
+  };
+}
+
 // Get attendance logs with filters
 export async function getAttendanceLogs(filters?: {
-  date?: string; // ISO date string YYYY-MM-DD
   startDate?: string;
   endDate?: string;
+  date?: string;
+  department?: string;
   status?: string; // "All" | "On Time" | "Late" | "Not Checked Out" | "Alpha"
   search?: string;
 }) {
@@ -37,7 +53,7 @@ export async function getAttendanceLogs(filters?: {
       await seedAttendanceLogsInternal();
     }
 
-    const whereClause: any = {};
+    const whereClause: AbsensiWhereInput = {};
 
     // Date range or single date filtering
     if (filters?.startDate && filters?.endDate) {
@@ -376,7 +392,7 @@ export async function recordAttendancePunch(
         revalidatePath("/admin/absensi");
         revalidatePath("/absensi");
         revalidatePath("/admin");
-      } catch (_) {}
+      } catch {}
 
       return {
         success: true,
@@ -419,7 +435,7 @@ export async function recordAttendancePunch(
       revalidatePath("/admin/absensi");
       revalidatePath("/absensi");
       revalidatePath("/admin");
-    } catch (_) {}
+    } catch {}
 
     return {
       success: true,
