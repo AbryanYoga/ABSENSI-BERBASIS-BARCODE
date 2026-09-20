@@ -160,3 +160,49 @@
 - **Verification**:
   - Production build compiled successfully (`npm run build`) generating static routes with 0 errors.
 - **Ready for Commit & Push**: Staged all changes and prepared commit under human developer identity.
+
+## [2026-09-20 17:28:46 +07:00] - Phase 4: Employee Management & QR Generation
+
+### Summary of Prompt:
+- Read and replicate the exact styling of the Employee Management mockup (`UI EMPLOYEE.png`) and digital credential badge mockup (`UI BARCODE.png`).
+- Build the Employee Management page (`app/(admin)/karyawan/page.tsx` / `src/app/(admin)/admin/karyawan/page.tsx`).
+- Implement the full-width flat Data Table (Shadcn Table) with columns: ID, Name, Role & Department, Credential Status, Actions.
+- Create/Update Flow: Implement the right-side Shadcn `Sheet` matching the mockup reference:
+  - Generate a unique `qr_code_id` upon creation.
+  - Server actions / API routes for creating and updating employee data.
+- Delete Flow: Implement the Shadcn `AlertDialog` for delete confirmation.
+- QR Code Modal: Implement the "View QR" button opening a minimalist Shadcn `Dialog` matching `UI BARCODE.png` with `react-qr-code`, credential card layout, and "Print" trigger (`window.print()`).
+- Update `log.md`, commit, and push.
+
+### Planned Actions:
+1. Re-inspect `Assets/UI/UI EMPLOYEE.png` and `Assets/UI/UI BARCODE.png` for table column styling, badge pills, avatar initials, action icons (`View QR`, edit pencil, delete trash), and digital credential modal layout.
+2. Create server actions or API endpoints (`/api/karyawan`) to perform CRUD operations on Prisma `Karyawan` model with auto-generated unique `qr_code_id`.
+3. Implement Employee Management page in `src/app/(admin)/admin/karyawan/page.tsx` (and re-export to `src/app/(admin)/karyawan/page.tsx` to support both URL structures `/admin/karyawan` and `/karyawan`).
+4. Build `Create/Update Employee Sheet` component with form validation (Name, Role/Jabatan).
+5. Build `Delete Employee Alert Dialog` using Shadcn `AlertDialog`.
+6. Build `QR Code & Digital Credential Dialog` using `react-qr-code` matching `UI BARCODE.png` with printable stylesheet and `window.print()` trigger.
+7. Seed initial realistic employee sample data if database is empty to match mockups.
+8. Verify all features (Create, Read, Update, Delete, View QR, Print), build verification with `npm run build`.
+9. Update `log.md`, commit, and push as `Abryan Yoga Pratama <admin@local.dev>`.
+
+### Completed Actions & Outcome:
+- **Server Actions (`src/actions/karyawan.ts`)**:
+  - Implemented `getKaryawans()`, `createKaryawan()`, `updateKaryawan()`, `deleteKaryawan()`, and `regenerateEmployeeQr()`.
+  - Added cryptographic unique token generation (`ATS-XXXX-XXXX` / `EMP-XXXX`) upon employee creation and regeneration.
+- **Data Table View (`src/app/(admin)/admin/karyawan/page.tsx` & `src/app/(admin)/karyawan/page.tsx`)**:
+  - Implemented full-width flat Shadcn `Table` with columns: Employee ID, Staff Member (with initials & email), Role & Department, Credential Status, Actions.
+  - Implemented live search filter across names, roles, and QR IDs.
+  - Added CSV export functionality and copy-to-clipboard for tokens.
+  - Top summary cards matching `UI EMPLOYEE.png` (Total Headcount, Active Credentials, Passes Pending QR, Sync Integrity).
+- **Create / Update Flow (`src/components/karyawan/EmployeeSheet.tsx`)**:
+  - Built sliding right-side Shadcn `Sheet` with form fields for Full Name and Role & Department.
+  - Displays token preview badge and handles validation and submission states.
+- **Delete Confirmation Flow (`src/components/karyawan/DeleteEmployeeDialog.tsx`)**:
+  - Built confirmation modal using Shadcn `AlertDialog` alerting user of credential revocation and purge.
+- **QR Code & Digital Credential Badge (`src/components/karyawan/QrCodeDialog.tsx`)**:
+  - Replicated `UI BARCODE.png` digital credential pass with avatar, role, QR code rendered via `react-qr-code`, 1D barcode simulation, and security metadata.
+  - Added "Print Badge" button triggering `window.print()` with custom print media queries isolating badge.
+  - Added "Regenerate QR" token feature.
+- **Verification**:
+  - `npm run build` compiled with 0 errors across all routes.
+- **Ready for Commit & Push**: Staged all changes and prepared commit under human developer identity.
