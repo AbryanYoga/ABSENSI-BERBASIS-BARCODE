@@ -71,6 +71,24 @@ export default function KioskScannerPage() {
   }, []);
 
   const [currentFacingMode, setCurrentFacingMode] = useState<"user" | "environment">("user");
+  const [isMirrored, setIsMirrored] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        return localStorage.getItem("kiosk_camera_mirrored") === "true";
+      } catch {}
+    }
+    return false;
+  });
+
+  const toggleMirror = () => {
+    setIsMirrored((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("kiosk_camera_mirrored", String(next));
+      } catch {}
+      return next;
+    });
+  };
 
   // 3. Initialize / toggle camera using html5-qrcode with mobile & tablet fallback
   const startCamera = async (facing: "user" | "environment" = currentFacingMode) => {
@@ -341,21 +359,38 @@ export default function KioskScannerPage() {
         {/* Left Column: Optical Camera Module HUD (7 Cols) */}
         <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs flex flex-col space-y-4">
           {/* Sensor Header Bar */}
-          <div className="flex items-center justify-between text-xs text-slate-600 bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200/80">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600 bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200/80">
+            <div className="flex flex-wrap items-center gap-2">
               <Camera className="w-4 h-4 text-slate-500" />
               <span className="font-semibold text-slate-800">Sensor Optical Module</span>
+              
+              {/* Camera Facing switch */}
               <button
                 type="button"
                 onClick={() => {
                   const nextMode = currentFacingMode === "user" ? "environment" : "user";
                   startCamera(nextMode);
                 }}
-                className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white hover:bg-slate-100 border border-slate-200 text-[11px] font-medium text-slate-700 transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white hover:bg-slate-100 border border-slate-200 text-[11px] font-medium text-slate-700 transition-colors cursor-pointer"
                 title="Switch between front and rear camera on tablets"
               >
                 <RotateCw className="w-3 h-3 text-[#006b5f]" />
                 <span className="capitalize">{currentFacingMode} Camera</span>
+              </button>
+
+              {/* Mirror toggle button */}
+              <button
+                type="button"
+                onClick={toggleMirror}
+                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded border text-[11px] font-medium transition-colors cursor-pointer ${
+                  isMirrored
+                    ? "bg-amber-50 border-amber-300 text-amber-900 hover:bg-amber-100"
+                    : "bg-teal-50 border-teal-200 text-teal-800 hover:bg-teal-100"
+                }`}
+                title="Klik untuk mengubah mode tampilan (Mirror / Non-Mirror)"
+              >
+                <RotateCw className="w-3 h-3 text-[#006b5f]" />
+                <span>{isMirrored ? "Mirror: Aktif" : "Jangan Mirror (Normal)"}</span>
               </button>
             </div>
             <div className="flex items-center gap-3 font-mono text-[11px] text-slate-500">
@@ -370,10 +405,27 @@ export default function KioskScannerPage() {
 
           {/* Centered Square Viewfinder Container */}
           <div className="relative w-full aspect-square max-h-[420px] bg-slate-950 rounded-2xl overflow-hidden flex items-center justify-center border-2 border-slate-800 shadow-inner">
-            {/* Real Webcam video mount point */}
+            {/* Floating Mirror Status Badge / Toggle */}
+            <div className="absolute top-3 right-3 z-30 pointer-events-auto">
+              <button
+                type="button"
+                onClick={toggleMirror}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900/85 hover:bg-slate-800 text-white text-[11px] font-medium border border-slate-700 shadow-md backdrop-blur-xs transition-all cursor-pointer"
+                title="Klik untuk flip kamera horizontal (Mirror / Normal)"
+              >
+                <RotateCw className="w-3 h-3 text-emerald-400" />
+                <span>{isMirrored ? "Mirror: Aktif" : "Mode: Normal (Non-Mirror)"}</span>
+              </button>
+            </div>
+
+            {/* Real Webcam video mount point - default is explicitly non-mirrored */}
             <div
               id="kiosk-video-viewfinder"
-              className="absolute inset-0 w-full h-full object-cover z-0 [&_video]:w-full [&_video]:h-full [&_video]:object-cover"
+              className={`absolute inset-0 w-full h-full object-cover z-0 [&_video]:w-full [&_video]:h-full [&_video]:object-cover ${
+                isMirrored
+                  ? "[&_video]:-scale-x-100"
+                  : "[&_video]:scale-x-100 [&_video]:!transform-none"
+              }`}
             />
 
             {/* High-tech HUD Overlay Reticle */}

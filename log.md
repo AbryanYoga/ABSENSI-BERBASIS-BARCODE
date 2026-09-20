@@ -457,4 +457,14 @@
   - Configured Git author: `Abryan Yoga Pratama <admin@local.dev>`.
   - Ready to commit and push changes.
 
+## [2026-09-20 20:25:00 +07:00] - Kiosk Camera Mirror Mode Adjustment
+
+### Summary & Actions:
+- **User Request**: "kamera scan nya jangan mirror" (Ensure the scan camera is not mirrored).
+- **Implementation**:
+  - Configured camera video feed in `src/app/scanner/page.tsx` with non-mirror mode by default (`[&_video]:scale-x-100 [&_video]:!transform-none`).
+  - Added interactive mirror toggle control (`isMirrored` state with `localStorage` persistence) in both the sensor header bar and directly floating on the optical HUD viewfinder (`Jangan Mirror (Normal)` vs `Mirror: Aktif`).
+  - Verified tests (`npm run test`) and ESLint (`npx eslint --quiet`) with 0 errors.
+
+
 
