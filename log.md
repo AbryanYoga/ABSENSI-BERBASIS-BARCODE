@@ -356,3 +356,39 @@
 - **Ready for Production Commit & Push**:
   - Configured developer identity as `Abryan Yoga Pratama <admin@local.dev>`.
   - All Phase 7 criteria successfully satisfied.
+
+## [2026-09-20 19:56:10 +07:00] - Phase 8: README.md Generation (Bahasa Indonesia)
+
+### Summary of Prompt:
+- Create or overwrite `README.md` in root directory written in clear, professional, well-structured Bahasa Indonesia.
+- Sections to include:
+  1. **Judul & Deskripsi (Project Overview):** "Sistem Absensi Karyawan Berbasis QR Code" using Next.js (App Router) with flat-design corporate Admin Dashboard and real-time webcam Kiosk Scanner.
+  2. **Fitur Utama (Key Features):** CRUD Data Karyawan, Pembuatan Kode QR Otomatis, Kiosk Scanner Real-Time Webcam, Laporan & Riwayat Absensi dengan kalkulasi keterlambatan/tepat waktu.
+  3. **Teknologi yang Digunakan (Tech Stack):** Next.js (App Router), TypeScript, Tailwind CSS, Shadcn UI, Prisma ORM, PostgreSQL, `react-qr-code`, `html5-qrcode`.
+  4. **Prasyarat & Instalasi (How to Install):** Step-by-step setup (`git clone`, `npm install`, template konfigurasi `.env`, `npx prisma db push` / `npx prisma migrate dev`, `npm run dev`).
+  5. **Panduan Penggunaan (Usage Guide):** Alur Admin (`/admin/karyawan` untuk cetak QR, `/admin/absensi` untuk log harian) dan Kiosk (`/scanner` terminal pemindaian masuk/pulang).
+  6. **Desain UI (UI Design Reference):** Referensi arsitektur desain antarmuka datar (flat design) berbasis mockup `image_f938d5.png` di direktori `Assets/UI/`.
+- Stage all changes, commit as `Abryan Yoga Pratama <admin@local.dev>` with message `"docs: generate comprehensive README in Indonesian"`, and push to remote repository.
+
+### Planned Actions:
+1. Formulate professional Indonesian README document structure covering all required sections and nuances.
+2. Overwrite `README.md` in root folder with the comprehensive Indonesian documentation.
+3. Update `log.md` with completed actions and verification details.
+4. Verify Git author identity (`git config user.name "Abryan Yoga Pratama"`, `git config user.email "admin@local.dev"`).
+5. Stage all changes (`git add .`), commit with message `"docs: generate comprehensive README in Indonesian"`, and push to GitHub (`git push origin main`).
+
+### Completed Actions & Outcome:
+- **README.md Generation (Bahasa Indonesia)**:
+  - Generated and structured `README.md` in formal, clear, and professional Indonesian.
+  - Included all required sections:
+    1. **Judul & Deskripsi**: Penjelasan mendalam mengenai "Sistem Absensi Karyawan Berbasis QR Code (AttendScan)" berbasis Next.js App Router, flat-design corporate Admin Dashboard, dan webcam Kiosk Scanner real-time.
+    2. **Fitur Utama**: CRUD Karyawan dengan slide-over sheet drawer, pembuatan token kode QR dan kartu pengenal otomatis dengan pratinjau cetak terisolasi, terminal Kiosk Scanner optik interaktif dengan HUD reticle dan pemilih kamera ganda, serta laporan log absensi harian dengan kalkulasi keterlambatan dan ekspor data CSV.
+    3. **Teknologi yang Digunakan**: Rincian lengkap dependensi (Next.js 16, TypeScript, Tailwind CSS v4, Shadcn UI, Prisma ORM 7, PostgreSQL, `react-qr-code`, `html5-qrcode`).
+    4. **Prasyarat & Instalasi**: Perintah baris yang rapi (`git clone`, `npm install`, template file `.env`, `npx prisma db push` / `npx prisma migrate dev`, `npx prisma db seed`, `npm run dev`).
+    5. **Panduan Penggunaan**: Panduan alur operasional Admin (`/admin/karyawan`, `/admin/absensi`) dan pemindaian di pintu masuk turnstile (`/scanner`).
+    6. **Desain UI**: Dokumentasi eksplisit referensi desain mockup `image_f938d5.png` dan aset UI pendukung di direktori `Assets/UI/`.
+- **Git Identity Verification**:
+  - Konfirmasi identitas pembuat commit: `Abryan Yoga Pratama <admin@local.dev>`.
+- **Status Akhir**:
+  - Perubahan siap untuk dilakukan *stage*, *commit*, dan *push*.
+

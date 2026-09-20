@@ -1,4 +1,4 @@
-# AttendScan - Enterprise Attendance & Access Management System
+# Sistem Absensi Karyawan Berbasis QR Code (AttendScan)
 
 [![Next.js 16](https://img.shields.io/badge/Next.js-16.3-black?style=flat&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat&logo=typescript)](https://www.typescriptlang.org/)
@@ -6,171 +6,156 @@
 [![Prisma ORM 7](https://img.shields.io/badge/Prisma-7.10-2d3748?style=flat&logo=prisma)](https://www.prisma.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 
-**AttendScan** is a mission-critical, enterprise-grade Employee Attendance and Turnstile Access Control web application. Designed around clean, flat corporate UI aesthetics with zero visual clutter, AttendScan provides automated optical QR and barcode check-in/out, live attendance telemetry, complete employee directory management, and comprehensive attendance audit logs.
+**Sistem Absensi Karyawan Berbasis QR Code** (**AttendScan**) adalah aplikasi web modern dan efisien yang dirancang khusus untuk mengelola presensi karyawan serta kontrol akses gerbang/turnstile kantor secara otomatis. Aplikasi ini menggabungkan antarmuka **Admin Dashboard** berarsitektur *flat-design* yang intuitif dan terminal **Kiosk Scanner** berbasis webcam secara *real-time*.
 
 ---
 
-## Key Features
+## 📌 Fitur Utama (Key Features)
 
-### 1. Optical Kiosk Scanner (`/scanner` & `/kiosk`)
-- **Real-Time Optical Reticle**: Integrated with `html5-qrcode` featuring animated laser targeting reticles, HUD telemetry overlay, and dual-camera switching (front/rear) tailored for mounted tablet kiosks (iPadOS Safari & Android Chrome).
-- **NTP-Synchronized Clock**: Precision digital terminal clock displaying exact hours, minutes, seconds, and date.
-- **Intelligent Check-In / Check-Out Logic**:
-  - **Scenario A (Check-In)**: Compares arrival time against configured office start time (`Pengaturan.jam_masuk_normal`, default `08:00`) and tags attendance as either **Tepat Waktu** (On Time) or **Terlambat** (Late with calculated deviation duration).
-  - **Scenario B (Check-Out)**: Automatically registers departure time (`waktu_pulang`) on second scan of the day.
-  - **Scenario C (Duplicate Protection)**: Prevents redundant punches if both check-in and check-out are already recorded, complete with anti-rebound scan debouncing.
-- **Visual & Audio Feedback**: Displays real-time employee profile cards, turnstile unlock banners (`Turnstile A-01 Unlocked • Access Granted • 15s`), and synthesized audio chimes.
-- **One-Click Simulator Panel**: Embedded controls to test on-time arrival, late entry, shift checkout, and invalid QR scenarios without needing physical badges.
+1. **Manajemen Karyawan (CRUD Employees)**
+   - Tambah, ubah, dan hapus profil data karyawan secara mudah dan cepat.
+   - Panel samping interaktif (*slide-over sheet*) untuk formulir input yang rapi tanpa berpindah halaman.
+   - Dialog konfirmasi aman untuk penghapusan data guna mencegah hilangnya data secara tidak sengaja.
 
-### 2. Executive Admin Dashboard (`/admin`)
-- **Key Metrics Telemetry**: Real-time KPI summary cards displaying Total Staff, Present Today, Late Arrivals, and System Status.
-- **Quick Kiosk Launcher**: Direct button to switch the terminal into dedicated full-screen scanning mode.
-- **Live Activity Stream**: Real-time audit log of the most recent employee turnstile punches with timestamps and punctuality status pills.
+2. **Pembuatan Kode QR Otomatis (Auto QR Code Generation)**
+   - Setiap karyawan baru secara otomatis menerima token identifikasi unik dan kode QR tersendiri.
+   - Modal pratinjau kartu tanda pengenal (*Employee Credential Badge*) dengan kode QR dan simulasi barcode standar.
+   - Fitur cetak langsung (*Print to Printer / PDF*) dengan tata letak cetak (*print stylesheet*) yang rapi dan terisolasi.
 
-### 3. Employee Management Directory (`/admin/karyawan`)
-- **Flat Corporate Data Table**: Clean, high-density listing of personnel with ID, Full Name, Role/Department, and Action triggers.
-- **Slide-Over Management Sheet**: Right-side drawer for creating and updating employee profiles with instant UUID and secure QR token generation.
-- **Employee Credential & QR Modal**: High-contrast printable badge dialog with `react-qr-code`, simulated 1D barcode preview, and clean `window.print()` print styles.
-- **Secure Deletion**: Confirmation dialog with dependency protection for clean database operations.
+3. **Terminal Kiosk Scanner Real-Time (Webcam Kiosk)**
+   - Pemindaian kode QR instan menggunakan kamera perangkat atau webcam eksternal via pustaka `html5-qrcode`.
+   - Bidik optik interaktif (*optical HUD reticle*) dilengkapi garis pandu laser hijau bergerak (*animated laser scan line*).
+   - Jam digital presisi tinggi tersinkronisasi waktu (*NTP-synchronized digital clock*).
+   - Tombol pengalih kamera depan/belakang (*Front / Rear Camera Toggle*) yang dioptimalkan untuk perangkat tablet/iPad pada turnstile gerbang masuk.
+   - Panel simulasi pemindaian (*Simulate Kiosk Scan*) untuk keperluan demonstrasi atau pengujian tanpa perlu mencetak kartu fisik.
 
-### 4. Attendance Logs & Auditing (`/admin/absensi`)
-- **Date Range Presets**: Filter records effortlessly with single-click presets (*Today*, *Yesterday*, *Last 7 Days*, *This Month*) or custom calendar date selection.
-- **Department & Search Filtering**: Instant client/server filtering across departments and employee names.
-- **Precision Status Badges**:
-  - `Tepat Waktu` (Emerald): On-time arrival.
-  - `Terlambat` (Rose): Late arrival with exact delay minutes calculation.
-  - `Shift In Progress` (Slate): Checked in, awaiting end-of-shift checkout.
-  - `Alpha` (Amber): Absent records.
+4. **Laporan & Rekap Absensi (Attendance Reports & Logic)**
+   - **Logika Otomatis Masuk & Pulang**:
+     - **Presensi Masuk (Check-In)**: Membandingkan waktu ketukan kartu dengan jam masuk normal kantor (`08:00:00`). Sistem secara otomatis memberi label **Tepat Waktu** (*On Time*) atau **Terlambat** (*Late*) lengkap dengan kalkulasi menit keterlambatannya.
+     - **Presensi Pulang (Check-Out)**: Secara otomatis mencatat waktu kepulangan pada pemindaian kedua di hari yang sama.
+     - **Pencegahan Duplikasi**: Menolak ketukan ganda jika presensi masuk dan pulang pada hari tersebut telah tercatat lengkap, dilengkapi mekanisme *debounce* anti-pemindaian berulang.
+   - **Filter Cepat Berdasarkan Tanggal**: Preset satu klik (*Hari Ini*, *Kemarin*, *7 Hari Terakhir*, *Bulan Ini*) serta pemilih tanggal kalender kustom.
+   - **Pencarian & Filter Departemen**: Filter data berdasarkan divisi/jabatan serta pencarian instan nama atau ID karyawan.
+   - **Ekspor Data**: Fitur ekspor data presensi ke format CSV dan pencetakan laporan harian.
 
 ---
 
-## Technology Stack
+## 🛠️ Teknologi yang Digunakan (Tech Stack)
 
-| Layer | Technology |
+| Komponen | Teknologi |
 | :--- | :--- |
-| **Framework** | [Next.js 16 (App Router)](https://nextjs.org/) with Turbopack & React Server Actions |
-| **Language** | [TypeScript 5](https://www.typescriptlang.org/) |
-| **Styling** | [Tailwind CSS v4](https://tailwindcss.com/) with flat corporate color tokens (`slate-50`, `teal-700`, `slate-200`) |
-| **UI Components** | [Shadcn UI](https://ui.shadcn.com/) with Radix / Base-UI primitives & [Lucide Icons](https://lucide.dev/) |
-| **Database & ORM** | [Prisma ORM 7](https://www.prisma.io/) with dual driver adapters (`@prisma/adapter-better-sqlite3` & `@prisma/adapter-pg`) |
-| **Optical Scanning** | [html5-qrcode](https://github.com/mebjas/html5-qrcode) & [react-qr-code](https://github.com/rosskhanas/react-qr-code) |
-| **Utilities** | [date-fns](https://date-fns.org/), `clsx`, `tailwind-merge` |
+| **Framework Utama** | [Next.js 16](https://nextjs.org/) (App Router, React Server Actions, Turbopack) |
+| **Bahasa Pemrograman** | [TypeScript](https://www.typescriptlang.org/) |
+| **Desain & Styling** | [Tailwind CSS v4](https://tailwindcss.com/) dengan palet token korporat modern |
+| **Komponen UI** | [Shadcn UI](https://ui.shadcn.com/) (berbasis Radix & Base-UI primitives) & [Lucide Icons](https://lucide.dev/) |
+| **Database & ORM** | [Prisma ORM 7](https://www.prisma.io/) (PostgreSQL di produksi, SQLite untuk pengujian lokal) |
+| **Pemindaian & Barcode** | [html5-qrcode](https://github.com/mebjas/html5-qrcode) & [react-qr-code](https://github.com/rosskhanas/react-qr-code) |
+| **Utilitas Waktu** | [date-fns](https://date-fns.org/) |
 
 ---
 
-## Database Architecture
+## 💻 Prasyarat & Instalasi (How to Install)
 
-The schema (`prisma/schema.prisma`) enforces strict relational integrity and daily attendance constraints:
+Pastikan di komputer Anda telah terpasang **Node.js** (versi 18.18.0 atau lebih baru) dan **npm** / **pnpm**.
 
-```prisma
-model Karyawan {
-  id           String    @id @default(uuid())
-  nama_lengkap String
-  jabatan      String
-  qr_code_id   String    @unique
-  absensi      Absensi[]
-}
-
-model Pengaturan {
-  id               Int    @id @default(1)
-  jam_masuk_normal String @default("08:00:00")
-}
-
-model Absensi {
-  id           String    @id @default(uuid())
-  karyawan_id  String
-  tanggal      DateTime
-  waktu_masuk  DateTime?
-  waktu_pulang DateTime?
-  status_masuk String
-
-  karyawan     Karyawan  @relation(fields: [karyawan_id], references: [id], onDelete: Cascade)
-
-  @@unique([karyawan_id, tanggal])
-}
-```
-
----
-
-## Getting Started (Local Development)
-
-### 1. Prerequisites
-- **Node.js**: v18.18.0 or newer
-- **npm** or **pnpm**
-
-### 2. Clone & Install
+### 1. Kloning Repositori
 ```bash
-# Clone the repository
 git clone https://github.com/AbryanYoga/ABSENSI-BERBASIS-BARCODE.git
 cd ABSENSI-BERBASIS-BARCODE
+```
 
-# Install dependencies
+### 2. Pasang Dependensi
+```bash
 npm install
 ```
 
-### 3. Environment Configuration
-Create a `.env` file in the root directory:
+### 3. Konfigurasi File Lingkungan (`.env`)
+Salin atau buat file `.env` di direktori utama (*root directory*):
+
 ```env
-# Local Development (SQLite)
+# Untuk Pengembangan Lokal (SQLite):
 DATABASE_URL="file:./dev.db"
 
-# Production PostgreSQL (Supabase / Vercel Postgres / Neon)
-# DATABASE_URL="postgresql://user:password@host:port/database?pgbouncer=true"
+# Untuk Lingkungan Produksi (PostgreSQL - contoh Supabase / Vercel Postgres):
+# DATABASE_URL="postgresql://postgres:[PASSWORD]@[HOST]:6543/postgres?pgbouncer=true"
+# DIRECT_URL="postgresql://postgres:[PASSWORD]@[HOST]:5432/postgres"
+
+# URL Aplikasi
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
 ```
 
-### 4. Initialize Database & Seed
-```bash
-# Apply migrations to local SQLite
-npx prisma migrate dev --name init
+### 4. Sinkronisasi Skema Database & Migrasi
+Jalankan salah satu perintah berikut untuk menyiapkan tabel database:
 
-# Seed default settings (jam_masuk_normal = "08:00")
+```bash
+# Untuk sinkronisasi langsung skema ke database:
+npx prisma db push
+
+# ATAU jalankan migrasi lokal:
+npx prisma migrate dev --name init
+```
+
+Inisialisasi pengaturan awal sistem (jam masuk kerja normal `08:00:00`):
+```bash
 npx prisma db seed
 ```
 
-### 5. Launch the Application
+### 5. Jalankan Server Pengembangan
 ```bash
 npm run dev
 ```
 
-Visit the following routes in your browser:
-- **Admin Dashboard**: [http://localhost:3000/admin](http://localhost:3000/admin)
-- **Employee Directory**: [http://localhost:3000/admin/karyawan](http://localhost:3000/admin/karyawan)
-- **Attendance Logs**: [http://localhost:3000/admin/absensi](http://localhost:3000/admin/absensi)
-- **Kiosk Optical Scanner**: [http://localhost:3000/scanner](http://localhost:3000/scanner)
+Buka peramban (*browser*) Anda dan akses aplikasi di:
+- **Halaman Utama / Dashboard Admin:** [http://localhost:3000/admin](http://localhost:3000/admin)
+- **Halaman Terminal Kiosk Scanner:** [http://localhost:3000/scanner](http://localhost:3000/scanner)
 
 ---
 
-## Production Deployment
+## 📖 Panduan Penggunaan (Usage Guide)
 
-For complete, step-by-step instructions on provisioning a production PostgreSQL database (Supabase, Vercel Postgres, Neon) and deploying to Vercel, please read the **[Production Deployment Guide (DEPLOYMENT.md)](DEPLOYMENT.md)**.
+### 1. Alur Administrator (Admin Portal)
+- **Kelola Karyawan (`/admin/karyawan`)**:
+  - Klik tombol **"+ Add Employee"** untuk menambahkan data anggota tim baru (Nama Lengkap dan Jabatan/Departemen). Sistem akan langsung menghasilkan ID unik dan kode QR.
+  - Klik ikon **QR Code** pada baris karyawan untuk melihat kartu identitas digital dan mencetak kartu fisik dengan tombol **"Print Badge"**.
+  - Ubah informasi karyawan atau hapus karyawan jika sudah tidak aktif.
+- **Lihat Rekap Presensi (`/admin/absensi`)**:
+  - Pantau rekap kehadiran harian karyawan secara komprehensif.
+  - Gunakan filter status (*All*, *On Time*, *Late*, *Not Checked Out*) atau saring berdasarkan rentang tanggal tertentu.
+  - Ekspor log data presensi ke file CSV melalui tombol **"Export CSV"**.
 
-### Quick Production Commands:
-```bash
-# 1. Update datasource in prisma/schema.prisma provider to "postgresql"
-# 2. Deploy migrations to production database
-npx prisma migrate deploy
+### 2. Alur Kiosk Presensi (Kiosk Terminal)
+- **Pemindaian Masuk & Pulang (`/scanner` atau `/kiosk`)**:
+  - Buka alamat `/scanner` pada perangkat yang diletakkan di pintu masuk atau turnstile kantor (misal: tablet, iPad, atau komputer pos sekuriti dengan webcam).
+  - Pastikan izin akses kamera (*Camera Permission*) telah diberikan. Jika menggunakan tablet, gunakan tombol alih kamera untuk memilih kamera depan atau belakang.
+  - Karyawan mengarahkan kode QR kartu mereka ke dalam kotak bidik optik hijau (*viewfinder*).
+  - Sistem akan langsung memverifikasi ID:
+    - Menampilkan notifikasi kartu karyawan yang terverifikasi (foto, nama, divisi, serta status kepatuhan waktu).
+    - Membuka simulasi akses gerbang (*Turnstile Unlocked - Access Granted*).
+    - Membunyikan nada konfirmasi keberhasilan pemindaian.
 
-# 3. Seed production settings
-npx prisma db seed
+---
 
-# 4. Build and verify
-npm run build
+## 🎨 Referensi Desain Antarmuka (UI Design Reference)
+
+Arsitektur antarmuka dan estetika visual aplikasi ini dirancang secara presisi mengacu pada berkas mockup **`image_f938d5.png`** (beserta mockup pelengkap `UI DASHBOARD.png`, `UI Absen.png`, `UI ATTEDANCE.png`, `UI BARCODE.png`, dan `UI EMPLOYEE.png`) yang terdapat pada direktori:
+```
+Assets/UI/
 ```
 
----
-
-## Tablet & Kiosk Hardware Setup
-
-When mounting tablets (iPadOS or Android tablets) at physical office turnstiles:
-1. **HTTPS Required**: Modern mobile browsers require HTTPS to access camera hardware. Deploy to Vercel or configure SSL.
-2. **Add to Home Screen (PWA Mode)**:
-   - On **iPad**: Open Safari, navigate to `/scanner`, tap the Share button, and choose **Add to Home Screen** to launch in frameless kiosk mode.
-   - On **Android**: Open Chrome, tap the menu, and choose **Install app** or **Add to Home screen**.
-3. **Camera Switching**: Use the built-in camera toggle button on the optical viewfinder to toggle between the front and rear camera depending on the tablet mount orientation.
+**Prinsip Desain yang Diterapkan:**
+- **Arsitektur Flat Design**: Mengeliminasi kartu berlapis (*nested cards*) yang berat, mengutamakan ruang putih (*whitespace*) dan batas garis halus (*border slate-200*).
+- **Palet Warna Korporat**: Latar belakang bersih `slate-50`, aksen korporat `teal-700` (`#006b5f`), status tepat waktu `emerald-500`, dan status keterlambatan `rose-500`.
+- **Tipografi Modern**: Font sans-serif yang bersih dipadukan dengan tipografi *monospace* untuk indikator jam, kode RFID, dan telemetri terminal.
 
 ---
 
-## Authors & Acknowledgments
+## 🚀 Panduan Deployment Produksi
+
+Untuk panduan lengkap mengenai cara menghubungkan database PostgreSQL di cloud (Supabase, Neon, Vercel Postgres), menjalankan perintah `npx prisma migrate deploy`, dan memasang aplikasi di Vercel, silakan baca dokumentasi terpisah pada berkas **[DEPLOYMENT.md](DEPLOYMENT.md)**.
+
+---
+
+## 👨‍💻 Pengembang & Lisensi
 
 - **Lead Developer**: Abryan Yoga Pratama (`admin@local.dev`)
-- **UI Architecture**: Flat Corporate Design System derived from Stitch AI specifications.
+- **Lisensi**: [MIT License](LICENSE)
