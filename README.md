@@ -147,6 +147,24 @@ Assets/UI/
 - **Palet Warna Korporat**: Latar belakang bersih `slate-50`, aksen korporat `teal-700` (`#006b5f`), status tepat waktu `emerald-500`, dan status keterlambatan `rose-500`.
 - **Tipografi Modern**: Font sans-serif yang bersih dipadukan dengan tipografi *monospace* untuk indikator jam, kode RFID, dan telemetri terminal.
 
+## 🧪 Pengujian Otomatis (Testing)
+
+Proyek ini dilengkapi dengan *automated test suite* berbasis **Jest** untuk menguji keabsahan logika bisnis *Check-In*, *Check-Out*, dan deteksi kepatuhan jadwal presensi pada *Server Actions* maupun REST API:
+
+### Skenario Pengujian yang Divalidasi:
+1. **Skenario 1 (Presensi Masuk Tepat Waktu)**: Memvalidasi pemindaian sebelum jam masuk normal (`jam_masuk_normal: 08:00:00`) menghasilkan status **"Tepat Waktu"**.
+2. **Skenario 2 (Presensi Masuk Terlambat)**: Memvalidasi pemindaian setelah jam masuk normal menghasilkan status **"Terlambat"** beserta kalkulasi menit keterlambatan.
+3. **Skenario 3 (Presensi Pulang Valid)**: Memvalidasi pemindaian kedua di hari yang sama memperbarui kolom `waktu_pulang` tanpa menambah baris data baru.
+4. **Skenario 4 (Pencegahan Duplikasi Presensi)**: Memvalidasi penolakan pemindaian ketiga ketika presensi masuk dan pulang hari tersebut sudah tercatat lengkap.
+5. **Skenario 5 (Token QR Tidak Ditemukan)**: Memvalidasi penolakan token identitas yang tidak terdaftar di database dan mengembalikan pesan *Not Found / Invalid QR*.
+6. **Validasi Endpoint REST API (`/api/attendance`)**: Memvalidasi status HTTP `200` untuk presensi sukses, `404` untuk token QR tidak dikenal, dan `409` untuk duplikasi.
+
+### Menjalankan Pengujian:
+Jalankan perintah berikut di terminal:
+```bash
+npm run test
+```
+
 ---
 
 ## 🚀 Panduan Deployment Produksi
